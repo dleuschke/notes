@@ -6,12 +6,12 @@ module Api::V1
 
     # GET /notes
     def index
-      @notes = Note.where(user: current_user)
+      @notes = Note.where(user: @current_user)
 
       render json: @notes
     end
 
-    # POST /drop/1
+    # POST /notes/1/drop
     def drop
       @note.drop @origin
       if @note.save
@@ -21,9 +21,9 @@ module Api::V1
       end
     end
 
-    # POST /grab/1
-    def grab
-      @note.grab @current_user
+    # POST /notes/1/pickup
+    def pickup
+      @note.pickup @current_user
 
       if @note.save
         render json: @note
@@ -34,7 +34,7 @@ module Api::V1
 
     # GET /notes/search
     def search
-      @notes = Note.within(0.2, units: :kms, @origin)
+      @notes = Note.within(0.2, units: :kms, origin: @origin)
 
       render json: @notes
     end
@@ -47,9 +47,10 @@ module Api::V1
     # POST /notes
     def create
       @note = Note.new(note_params)
+      @note.user = @current_user
 
       if @note.save
-        render json: @note, status: :created, location: @note
+        render json: @note, status: :created #, location: @note
       else
         render json: @note.errors, status: :unprocessable_entity
       end
@@ -83,8 +84,7 @@ module Api::V1
 
       # Only allow a trusted parameter "white list" through.
       def note_params
-        params.require(:note).permit(:user_id, :content, :lat, :lng)
+        params.require(:note).permit(:content)
       end
-  end
   end
 end

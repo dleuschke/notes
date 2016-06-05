@@ -1,6 +1,6 @@
 class Note < ApplicationRecord
   acts_as_mappable
-  belongs_to :user
+  belongs_to :user, optional: true
 
   def drop(location)
     self.user = nil
@@ -8,7 +8,7 @@ class Note < ApplicationRecord
     self.lng = location.lng
   end
 
-  def grab(user)
+  def pickup(user)
     self.user = user
   end
 end
